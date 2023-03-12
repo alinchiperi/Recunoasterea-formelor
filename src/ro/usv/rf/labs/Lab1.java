@@ -19,18 +19,15 @@ public class Lab1 {
         matrixAsLists.add ( linie1 );
 
         double[][] matrix = FileUtils.convertToBiDimensionalArray(matrixAsLists);
-//        double[][] matrixFromFile = FileUtils.readMatrixFromFileStream("matrix.txt");
-
-//        System.out.println(FileUtils.readTextFile("steaua.txt"));
+        double[][] matrixFromFile = FileUtils.readLearningSetFromFile("matrix.txt");
 
 
-//        System.out.println("Matrix from file: ");
-//        DataUtils.printMatrix(matrixFromFile);
-//        double[][] patternSet = DataUtils.normalizeLearningSet(matrixFromFile);
+        DataUtils.printMatrix(matrixFromFile);
+        double[][] patternSet = DataUtils.normalizeLearningSet(matrixFromFile);
 
-//        FileUtils.writePatternSetToFile("output.txt",patternSet,",");
+        FileUtils.writeLearningSetToFile("output.txt",patternSet);
         //Print matrix
-//        DataUtils.printMatrix(patternSet);
+        DataUtils.printMatrix(patternSet);
 
 
     }
