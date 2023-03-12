@@ -69,6 +69,26 @@ public class StatisticsUtils {
         }
         return dispersion;
     }
+    public static double calculateCovariance(Double[] feature1, Double[] feature2, double feature1WeightedAverage, double feature2WeightedAverage) {
+        double covariance;
+        double sum = 0;
+        for (int i = 0; i < feature1.length; i++) {
+            sum += (feature1[i] - feature1WeightedAverage) * (feature2[i] - feature2WeightedAverage);
+        }
+        covariance = (1.0 / (feature1.length - 1)) * sum;
+        return covariance;
+    }
+
+    public static double calculateCorrelationCoefficient(double covariance, double feature1Dispersion, double feature2Dispersion) {
+        return covariance / Math.sqrt(feature1Dispersion * feature2Dispersion);
+    }
+    protected static double getSumForDispersion(double[] feature, double featureWeightedAverage) {
+        double sum = 0;
+        for (double f : feature) {
+            sum += Math.pow(f - featureWeightedAverage, 2);
+        }
+        return sum;
+    }
 
 
 }
