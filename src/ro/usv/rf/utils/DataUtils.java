@@ -1,13 +1,16 @@
 package ro.usv.rf.utils;
 
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class DataUtils {
+
+    private static DecimalFormat df = new DecimalFormat("0.00");
     public static void printMatrix(double[][] x) {
         for (double[] lin : x) {
             for (double xcrt : lin)
-                System.out.print(xcrt + "\t");
+                System.out.print(df.format(xcrt) + "\t");
             System.out.println();
         }
     }

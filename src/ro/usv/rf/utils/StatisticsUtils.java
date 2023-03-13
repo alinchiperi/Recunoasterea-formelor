@@ -75,7 +75,7 @@ public class StatisticsUtils {
         for (int i = 0; i < feature1.length; i++) {
             sum += (feature1[i] - feature1WeightedAverage) * (feature2[i] - feature2WeightedAverage);
         }
-        covariance = (1.0 / (feature1.length - 1)) * sum;
+        covariance = (1.0 / (feature1.length - 1 )) * sum;
         return covariance;
     }
 
