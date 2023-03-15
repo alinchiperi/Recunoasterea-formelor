@@ -3,11 +3,14 @@ package ro.usv.rf.classes;
 import ro.usv.rf.utils.DistanceUtils;
 
 import java.text.DecimalFormat;
-import java.util.Arrays;
 
 public class DistanceMatrix {
     private static final DecimalFormat df = new DecimalFormat("0.00");
     private double[][] matDist;
+    private double[][] patternSet;
+    private boolean full;
+    private IDistance distance;
+
 
     public DistanceMatrix(double[][] patternSet) {
         int n = patternSet.length;
@@ -17,6 +20,29 @@ public class DistanceMatrix {
                 matDist[i][j] = DistanceUtils.distEuclid(patternSet[i], patternSet[j]);
             }
         }
+    }
+
+    public DistanceMatrix(double[][] patternSet, IDistance distance, boolean full) {
+        this.patternSet = patternSet;
+        this.distance = distance;
+        this.full = full;
+        if (full)
+            calculateDistanceFullMatrix();
+        else
+            calculateDistanceTriangleMatrix();
+    }
+
+    public void setDistance(IDistance distance) {
+        this.distance = distance;
+        if (this.full)
+            calculateDistanceFullMatrix();
+        else
+            calculateDistanceTriangleMatrix();
+
+    }
+
+    public void setFull(boolean full) {
+        this.full = full;
     }
 
     public double[][] neighbors(int i) {
@@ -41,6 +67,34 @@ public class DistanceMatrix {
         return neighbors;
     }
 
+
+    private void calculateDistanceFullMatrix() {
+        int n = patternSet.length;
+        matDist = new double[n][n];
+        for (int i = 0; i < n; i++) {
+            matDist[i][i] = 0;
+            for (int j = 0; j < i; j++) {
+                matDist[i][j] = matDist[j][i] = this.distance.calcDist(patternSet[i], patternSet[j]);
+            }
+        }
+    }
+
+    private void calculateDistanceTriangleMatrix() {
+        int n = patternSet.length;
+        matDist = new double[n - 1][];
+        for (int i = 1; i < n; i++) {
+            matDist[i - 1] = new double[i];
+            for (int j = 0; j < i; j++) {
+                matDist[i - 1][j] = this.distance.calcDist(patternSet[i], patternSet[j]);
+            }
+        }
+    }
+
+    public double getDistance(int i, int j) {
+        if (this.full)
+            return matDist[i][j];
+        return i == j ? 0. : (i > j ? matDist[i][j] : matDist[j][i]);
+    }
 
     @Override
     public String toString() {
