@@ -1,11 +1,11 @@
 package ro.usv.rf.utils;
 
+import ro.usv.rf.classes.Pair;
 import ro.usv.rf.classes.Pattern;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.IntStream;
 
 public class StatisticsUtils {
 
@@ -33,6 +33,26 @@ public class StatisticsUtils {
         }
         return patternsMap;
     }
+
+    public static Map<Pattern, Pair<Double, Integer>> getPatternsMapFromInitialSet(double[][] patternSet, int[] iClass) {
+        Map<Pattern, Pair<Double, Integer>> patternsMap = new LinkedHashMap<>();
+        for (int i = 0; i < patternSet.length; i++) {
+            Pattern patternObject = new Pattern(patternSet[i]);
+            if (patternsMap.containsKey(patternObject)) {
+                Pair<Double, Integer> pGasit = patternsMap.get(patternObject);
+                if (pGasit.getiClass() == iClass[i]) {
+                    pGasit.setWeight(pGasit.getWeight() + 1);
+                    patternsMap.put(patternObject, pGasit);
+                } else {
+                    throw new RuntimeException("Pattern not match");
+                }
+            } else {
+                patternsMap.put(patternObject, new Pair<>(1., iClass[i]));
+            }
+        }
+        return patternsMap;
+    }
+
 
     public static double[] calculateWeightedAverages(Map<Pattern, Double> patternsMap, int numberOfFeatures) {
         double[] weightedAverages = new double[numberOfFeatures];
@@ -69,19 +89,21 @@ public class StatisticsUtils {
         }
         return dispersion;
     }
+
     public static double calculateCovariance(Double[] feature1, Double[] feature2, double feature1WeightedAverage, double feature2WeightedAverage) {
         double covariance;
         double sum = 0;
         for (int i = 0; i < feature1.length; i++) {
             sum += (feature1[i] - feature1WeightedAverage) * (feature2[i] - feature2WeightedAverage);
         }
-        covariance = (1.0 / (feature1.length - 1 )) * sum;
+        covariance = (1.0 / (feature1.length - 1)) * sum;
         return covariance;
     }
 
     public static double calculateCorrelationCoefficient(double covariance, double feature1Dispersion, double feature2Dispersion) {
         return covariance / Math.sqrt(feature1Dispersion * feature2Dispersion);
     }
+
     protected static double getSumForDispersion(double[] feature, double featureWeightedAverage) {
         double sum = 0;
         for (double f : feature) {
