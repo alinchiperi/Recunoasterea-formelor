@@ -10,21 +10,30 @@ import java.util.stream.Stream;
 
 public class FileUtils1 
 {
+	private static String inputFileValuesSeparator = "\\s+"; // pentru a permite utilizarea a 2 separatori
+	private static final String outputFileValuesSeparator = ",";
+	
+	public static void setinputFileValuesSeparator(String separator) {
+		inputFileValuesSeparator = separator;
+	}
+
+	public static void setinputFileValuesSeparator() {
+		inputFileValuesSeparator = "\\s+";
+	}
+
 	protected static String[][] readStringMatrixFromFileStream(String fileName) {
 	     try (Stream<String> stream = Files.lines(Paths.get(fileName)))
 	    {
-	            return stream.map(Line -> Line.split("\\s+"))    
+	            return stream.map(Line -> Line.split(inputFileValuesSeparator))    
 	                                  .toArray(String[][]::new);
 	    } catch (IOException e) {
 	             e.printStackTrace();
 	             return null;
 	    }
 	}
+
 	
-	private static final String inputFileValuesSeparator = "[ \t]"; // pentru a permite utilizarea a 2 separatori
-	private static final String outputFileValuesSeparator = ",";
-	
-    public static double[][] readMatrixFromFileStream(String fileName)
+   public static double[][] readMatrixFromFileStream(String fileName)
 	{
 		// read file into stream, try-with-resources
                 double[][] matrice=null;

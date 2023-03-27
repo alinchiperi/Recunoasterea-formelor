@@ -1,116 +1,138 @@
 package ro.usv.rf.utils;
 
-import ro.usv.rf.classes.Pair;
 import ro.usv.rf.classes.Pattern;
 
-import java.util.HashMap;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class StatisticsUtils {
+	
+	public static double calculateFeatureAverage(double[] feature)
+	{
+		double average = 0.0;
+		for (int i=0; i<feature.length; i++)
+		{
+			average += feature[i];
+		}
+		average = average/feature.length;
+		return average;
+	}
+	
 
-    public static double calculateFeatureAverage(double[] feature) {
-//        return Arrays.stream(feature).average().getAsDouble();
-        double average = 0.0;
-        for (double v : feature) {
-            average += v;
-        }
-        average = average / feature.length;
-        return average;
-    }
-
-
-    public static Map<Pattern, Double> getPatternsMapFromInitialSet(double[][] patternSet) {
-        Map<Pattern, Double> patternsMap = new HashMap<>();
-        for (double[] line : patternSet) {
-            Pattern pattern = new Pattern(line);
-            if (patternsMap.containsKey(pattern)) {
-                double current = patternsMap.get(pattern);
-                patternsMap.put(pattern, current + 1);
-            } else {
-                patternsMap.put(pattern, 1.);
-            }
-        }
-        return patternsMap;
-    }
-
-    public static Map<Pattern, Pair<Double, Integer>> getPatternsMapFromInitialSet(double[][] patternSet, int[] iClass) {
-        Map<Pattern, Pair<Double, Integer>> patternsMap = new LinkedHashMap<>();
-        for (int i = 0; i < patternSet.length; i++) {
-            Pattern patternObject = new Pattern(patternSet[i]);
-            if (patternsMap.containsKey(patternObject)) {
-                Pair<Double, Integer> pGasit = patternsMap.get(patternObject);
-                if (pGasit.getiClass() == iClass[i]) {
-                    pGasit.setWeight(pGasit.getWeight() + 1);
-                    patternsMap.put(patternObject, pGasit);
-                } else {
-                    throw new RuntimeException("Pattern not match");
-                }
-            } else {
-                patternsMap.put(patternObject, new Pair<>(1., iClass[i]));
-            }
-        }
-        return patternsMap;
-    }
+	
+	public static Map<Pattern, Double> getPatternsMapFromInitialSet(double[][] patternSet) {
+		Map<Pattern, Double> patternsMap = new LinkedHashMap<Pattern, Double>();
+		
+		for (int i=0;i<patternSet.length; i++)
+		{
+			Pattern patternObject = new Pattern( patternSet[i]);
+			if(patternsMap.containsKey(patternObject))
+			{
+				double currentWeight = patternsMap.get(patternObject);
+				double newWeight = currentWeight +1;
+				patternsMap.put(patternObject, newWeight);
+			}
+			else
+			{
+				patternsMap.put(patternObject, 1.);
+			}
+		}
+		return patternsMap;
+	}
 
 
-    public static double[] calculateWeightedAverages(Map<Pattern, Double> patternsMap, int numberOfFeatures) {
-        double[] weightedAverages = new double[numberOfFeatures];
-        double totalWeight = 0;
-        for (Map.Entry<Pattern, Double> entry : patternsMap.entrySet()) {
-            Pattern pattern = entry.getKey();
-            double weight = entry.getValue();
-            double[] patternValues = pattern.getPatternValues();
-            totalWeight += weight;
-            for (int i = 0; i < numberOfFeatures; i++) {
-                weightedAverages[i] += weight * patternValues[i];
-            }
-        }
-        for (int i = 0; i < numberOfFeatures; i++) {
-            weightedAverages[i] = weightedAverages[i] / totalWeight;
-        }
-        return weightedAverages;
-    }
+	public static double[] calculateWeightedAverages(Map<Pattern, Double> patternsMap, int numberOfFeatures) {
+		double[]  weightedAverages = new double[numberOfFeatures];
+		int totalWeight = 0;
+		for(Map.Entry<Pattern, Double> entry : patternsMap.entrySet())
+		{
+			Pattern patternObject = entry.getKey();
+			double weight = entry.getValue();
+			totalWeight += weight;
+			double[] patternValues = patternObject.getPatternValues();
+			for (int j=0; j<numberOfFeatures; j++)
+			{
+				weightedAverages[j] += patternValues[j] * weight;
+			}
+		}
+		for (int j=0; j<numberOfFeatures; j++)
+		{
+			weightedAverages[j] /= totalWeight;
+			System.out.println(weightedAverages[j]);
+		}
 
-    public static double[] calculateFeatureDispersion(Map<Pattern, Double> patternsMap, int numberOfFeatures, double[] avg) {
-        double[] dispersion = new double[numberOfFeatures];
-        double totalWeight = 0;
-        for (Map.Entry<Pattern, Double> entry : patternsMap.entrySet()) {
-            Pattern pattern = entry.getKey();
-            double weight = entry.getValue();
-            double[] patternValues = pattern.getPatternValues();
-            totalWeight += weight;
-            for (int i = 0; i < numberOfFeatures; i++) {
-                dispersion[i] += (patternValues[i] - avg[i]) * (patternValues[i] - avg[i]) * entry.getValue();
-            }
-        }
-        for (int i = 0; i < numberOfFeatures; i++) {
-            dispersion[i] = dispersion[i] / (totalWeight - 1);
-        }
-        return dispersion;
-    }
+		return weightedAverages;
+	}
+	
+	public static double[] getPatternWeigths(Map<Pattern, Double> patternsMap) {
+		return patternsMap.values().stream()
+				.mapToDouble(x -> x.doubleValue() )
+				.toArray();		
+	}
 
-    public static double calculateCovariance(Double[] feature1, Double[] feature2, double feature1WeightedAverage, double feature2WeightedAverage) {
-        double covariance;
-        double sum = 0;
-        for (int i = 0; i < feature1.length; i++) {
-            sum += (feature1[i] - feature1WeightedAverage) * (feature2[i] - feature2WeightedAverage);
-        }
-        covariance = (1.0 / (feature1.length - 1)) * sum;
-        return covariance;
-    }
+	public static double[][] getPatterns(Map<Pattern, Double> patternsMap) {
+		return patternsMap.keySet().stream()
+				.map(Pattern::getPatternValues )
+				.toArray(double[][]::new);		
+	}
 
-    public static double calculateCorrelationCoefficient(double covariance, double feature1Dispersion, double feature2Dispersion) {
-        return covariance / Math.sqrt(feature1Dispersion * feature2Dispersion);
-    }
+	public static double[] calculateWeightedAverages(double[][] X, double[] f) {
+		// avgj = Sigma(xj*fi) / Sigma(fi)
+		int n = X.length;
+		int p = X[0].length;
+		int j;
+		double[] avgj = new double [p];
+		for(j=0; j<p; j++) {
+			avgj[j] = 0.; 
+		}
+		double sigmafi =0;
+		for(int i=0; i<n; i++)  {
+			for(j=0; j<p; j++) {
+				avgj[j] += X[i][j]*f[i];
+		    }
+			sigmafi += f[i];
+		}
+		for(j=0; j<p; j++) {
+			avgj[j] /= sigmafi; 
+		}
+		return avgj;
+	}
 
-    protected static double getSumForDispersion(double[] feature, double featureWeightedAverage) {
-        double sum = 0;
-        for (double f : feature) {
-            sum += Math.pow(f - featureWeightedAverage, 2);
-        }
-        return sum;
-    }
+	public static double[] calculateFeaturesStandardDeviations(double[][] X, double[] f, double[] avgj) {
+		// stdj = Sigma[fi(xj - avgj)^2] / Sigma(fi)
+		//
+		int n = X.length;
+		int p = X[0].length;
+		int j;
+		double[] stdj = new double [p];
+		double sigmafi = 0;
+		for(j=0; j<p; j++) {
+			stdj[j] = 0.; 
+		}
+		for(int i=0; i<n; i++)  {
+			for(j=0; j<p; j++) {
+				stdj[j]  += f[i]*(X[i][j] - avgj[j]) * (X[i][j] - avgj[j]);
+		    }
+			sigmafi += f[i];
+		}
+		for(j=0; j<p; j++) {
+			stdj[j] = Math.sqrt(stdj[j]/sigmafi); 
+		}
+		return  stdj;
+		
+	}
 
+	
+	public static double[] calculateFeaturesStandardDeviations(double[][] X, double[] f) {
+		// stdj = Sigma[fi(xj - avgj)^2] / Sigma(fi)
+		double avgj[] = calculateWeightedAverages(X, f);
+		return calculateFeaturesStandardDeviations(X, f, avgj);
+	}
+	
+	public double[] calculateFeaturesAverages(double[][] X) {
+		return calculateWeightedAverages(getPatternsMapFromInitialSet(X), X[0].length);
+	}
+	
 
 }

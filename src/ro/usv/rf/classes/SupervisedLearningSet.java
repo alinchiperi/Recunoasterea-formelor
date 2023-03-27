@@ -1,4 +1,4 @@
-package ro.usv.rf.learningsets;
+package ro.usv.rf.classes;
 
 import java.util.Arrays;
 import java.util.List;

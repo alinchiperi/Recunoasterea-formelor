@@ -74,7 +74,7 @@ public class DistanceMatrix {
         for (int i = 0; i < n; i++) {
             matDist[i][i] = 0;
             for (int j = 0; j < i; j++) {
-                matDist[i][j] = matDist[j][i] = this.distance.calcDist(patternSet[i], patternSet[j]);
+                matDist[i][j] = matDist[j][i] = this.distance.calculateDistance(patternSet[i], patternSet[j]);
             }
         }
     }
@@ -85,7 +85,7 @@ public class DistanceMatrix {
         for (int i = 1; i < n; i++) {
             matDist[i - 1] = new double[i];
             for (int j = 0; j < i; j++) {
-                matDist[i - 1][j] = this.distance.calcDist(patternSet[i], patternSet[j]);
+                matDist[i - 1][j] = this.distance.calculateDistance(patternSet[i], patternSet[j]);
             }
         }
     }

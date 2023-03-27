@@ -6,21 +6,23 @@ import ro.usv.rf.learningsets.SupervisedLearningSet;
 import ro.usv.rf.learningsets.UnsupervisedLearningSet;
 
 public abstract class AbstractClassifier {
-    protected int n;
-    protected int p;
-    protected int M;
-    protected double[][] X;
-    protected double[] f;
-    protected int[] iClass;
-    protected String[] classNames;
-    protected double[][] w;
+    protected int n;   			// number of patterns
+    protected int p;   			// number of features
+    protected int M;   			// number of classes
+    protected double[][] X;    	// patterns matrix  [n][p]
+    protected double[] f;      	// patterns weights (f[i] = the weight of pattern i)
+    protected int[] iClass;    	// pattern classes (iClass[i] = index of class of pattern i)
+    protected String[] classNames;  // names of classes [M+1], because classNames[0]="")
+    protected double[][] w;         // the model of classifier
+    
+    private int[] iClassCalculated;
     
     abstract public void training();  
     abstract public int predict(double[] z);
     
     public int[] predict(double[][] testSet) {
-           return Arrays.stream(testSet)     
-    			        .mapToInt(z -> predict(z))
+           return Arrays.stream(testSet)            //Stream<double []>   
+    			        .mapToInt(z -> predict(z))  //IntStream  (livreaza int)
     			        .toArray();
     }
     
@@ -85,4 +87,38 @@ public abstract class AbstractClassifier {
         //return the coefficients of discriminant functions
         return w;
     }
+    // ---------------------- Classifier Accuracy Evaluation ------------
+    public double evaluateAccuracy(SupervisedLearningSet testSet, boolean print) {
+    	return evaluateAccuracy(testSet.getX(), testSet.getIClass(), print);
+    }
+    
+    public double evaluateAccuracy(boolean print) {
+    	return evaluateAccuracy (X, iClass, print);
+    }
+
+    public double evaluateAccuracy(double X[][], int iClass[], boolean print) {
+    	iClassCalculated = predict(X);
+    	int nbCorrectClassified = 0;
+    	if(print)
+    		System.out.println("Classifier performance evaluation \nNr.\tCls.fis\tCls.calc");
+    	for (int i=0; i< X.length; i++) {
+    		boolean sameClassification = iClass[i] == iClassCalculated[i]; 
+    		if(print) {
+    			System.out.println((i+1) + ".\t" + classNames[ iClass[i] ] + "\t" + 
+    		            classNames[ iClassCalculated[i] ] +
+    					(sameClassification?"" : "  *"));
+    		}
+    		nbCorrectClassified += sameClassification ? 1 : 0;
+    	}
+    	double accuracy = (double)nbCorrectClassified / X.length;
+    	if(print) {
+    		System.out.println("\nNr. of patterns correctly classified  ="+ nbCorrectClassified);
+    		System.out.println("Accuracy =" + String.format(" %.3f %%", accuracy*100 ));
+    	}
+    	return accuracy;
+      }
+    
+    public int[] getiClassCalculated() {
+		return iClassCalculated;
+	}
 }

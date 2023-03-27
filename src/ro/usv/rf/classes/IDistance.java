@@ -1,5 +1,5 @@
 package ro.usv.rf.classes;
 
 public interface IDistance {
-    double calcDist(double[] x, double[] y);
+ public double calculateDistance( double[] x, double[] y);
 }

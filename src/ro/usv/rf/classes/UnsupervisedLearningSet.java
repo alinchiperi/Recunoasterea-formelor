@@ -1,12 +1,10 @@
-package ro.usv.rf.learningsets;
-
+package ro.usv.rf.classes;
 
 import java.util.Arrays;
 
 
 import ro.usv.rf.utils.DataUtils;
 import ro.usv.rf.utils.FileUtils1;
-
 
 public class UnsupervisedLearningSet {
 	protected double[][] X;  // the pattern matrix
