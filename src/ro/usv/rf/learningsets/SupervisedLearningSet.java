@@ -63,7 +63,6 @@ public class SupervisedLearningSet extends UnsupervisedLearningSet {
 
         }
 
-//        Arrays.fill(f, 1.);  // TODO: replace it by counting identical patterns
         // check if 2 identical patterns has same class (must be!)
         // if a reduced set is produce update the value of n
         return f;

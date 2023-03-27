@@ -37,11 +37,12 @@ public class UnsupervisedLearningSet {
         n = X == null ? 0 : X.length;
         p = X == null || X[0] == null ? 0 : X[0].length;
 
-
-
-        // TODO check if all the patterns have the same number of features
-        //            if not throw an Exception
-        if( this instanceof SupervisedLearningSet)
+        for (int i = 1; i < n; i++) {
+            if (X[i].length != p) {
+                throw new IllegalArgumentException("All patterns must have the same number of features");
+            }
+        }
+        if (this instanceof SupervisedLearningSet)
             return;
         if (f == null) {
             f = calculateWeightsValues();

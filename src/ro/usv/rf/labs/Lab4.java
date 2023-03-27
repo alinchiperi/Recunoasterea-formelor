@@ -66,7 +66,7 @@ public class Lab4 {
         System.out.println(separatorLine);
         demoSupervisedLearningSet();
         System.out.println(separatorLine);
-//        demoClassifier_1NN();
+        demoClassifier_1NN();
     }
 
 }
