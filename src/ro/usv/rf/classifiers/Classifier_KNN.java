@@ -2,6 +2,7 @@ package ro.usv.rf.classifiers;
 
 import ro.usv.rf.classes.IDistance;
 import ro.usv.rf.classes.Neighbour;
+import ro.usv.rf.classes.Pattern;
 import ro.usv.rf.utils.DistanceUtils;
 
 import java.util.ArrayList;
@@ -11,11 +12,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.Random;
 
 public class Classifier_KNN extends AbstractClassifier {
 
     IDistance d;
+
+    Pattern[] patternNeighbors ;
     int k;
     private boolean debug = true;
 
@@ -40,22 +42,28 @@ public class Classifier_KNN extends AbstractClassifier {
     @Override
     public int predict(double[] z) {
         List<Neighbour> neighbours = new ArrayList<>();
+
         for (int i = 0; i < n; i++) {
             if (Arrays.equals(X[i], z)) {
                 continue; // skip if the pattern is the same as z
             }
             double distance = d.calculateDistance(X[i], z);
-            neighbours.add(new Neighbour(i, distance));
+            neighbours.add(new Neighbour(distance, i));
         }
         Collections.sort(neighbours);
 
+        patternNeighbors = new Pattern[k];
+        for (int i = 0; i < k; i++) {
+            int index = neighbours.get(i).getIClass();
+            patternNeighbors[i] = new Pattern(X[index], iClass[index]);
+        }
+
         Map<Integer, Integer> classCounts = new HashMap<>();
         for (int i = 0; i < k; i++) {
-            int classIndex = iClass[neighbours.get(i).getClassIndex()];
+            int classIndex = iClass[neighbours.get(i).getIClass()];
             int count = classCounts.getOrDefault(classIndex, 0);
             classCounts.put(classIndex, count + 1);
         }
-
         int maxCount = 0;
         int predictedClass = -1;
         for (Map.Entry<Integer, Integer> entry : classCounts.entrySet()) {
@@ -64,7 +72,9 @@ public class Classifier_KNN extends AbstractClassifier {
                 predictedClass = entry.getKey();
             }
         }
+
         return predictedClass;
+
     }
 
 
@@ -80,4 +90,9 @@ public class Classifier_KNN extends AbstractClassifier {
     }
 
 
+    public Pattern[] getPaternNeighbors() {
+
+
+        return patternNeighbors;
+    }
 }

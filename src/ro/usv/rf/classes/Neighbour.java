@@ -1,36 +1,32 @@
 package ro.usv.rf.classes;
 
-public class Neighbour implements Comparable<Neighbour> {
+public class Neighbour implements Comparable<Neighbour>{
+	double distance;
+	int iClass;
+	
+	/**
+	 * 
+	 * @param distance
+	 * @param iClass
+	 */
+	public Neighbour(double distance, int iClass) {
+		super();
+		this.distance = distance;
+		this.iClass = iClass;
 
-    private double distance;
-    private int classIndex;
-    @Override
-    public int compareTo(Neighbour o)
-    {
-        return Double.compare(this.distance, o.distance);
-    }
+	}
+			
+	public double getDistance() {
+		return distance;
+	}
 
-    public Neighbour( int classIndex, double distance) {
-        this.distance = distance;
-        this.classIndex = classIndex;
-    }
-
-    public Neighbour() {
-    }
-
-    public double getDistance() {
-        return distance;
-    }
-
-    public void setDistance(double distance) {
-        this.distance = distance;
-    }
-
-    public int getClassIndex() {
-        return classIndex;
-    }
-
-    public void setClassIndex(int classIndex) {
-        this.classIndex = classIndex;
-    }
+	public int getIClass() {
+		return iClass;
+	}
+	
+	
+	@Override
+	public int compareTo(Neighbour o) {
+		return  Double.compare(distance, o.getDistance());
+	}
 }

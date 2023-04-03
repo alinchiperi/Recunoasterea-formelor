@@ -133,6 +133,20 @@ public class StatisticsUtils {
 	public double[] calculateFeaturesAverages(double[][] X) {
 		return calculateWeightedAverages(getPatternsMapFromInitialSet(X), X[0].length);
 	}
-	
+	public static double[][] calculateMinMax(double[][] x) {
+		double[][] minMax = new double[2][x[0].length];
+		double[] min = minMax[0];
+		double[] max = minMax[1];
+		for (int j = 0; j < x[0].length; j++) {
+			max[j] = x[0][j];
+			min[j] = x[0][j];
+			for (double[] doubles : x) {
+				max[j] = Math.max(doubles[j], max[j]);
+				min[j] = Math.min(doubles[j], min[j]);
+
+			}
+		}
+		return minMax;
+	}
 
 }
