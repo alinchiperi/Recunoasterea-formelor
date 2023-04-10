@@ -22,7 +22,7 @@ public abstract class AbstractClassifier {
     
     public int[] predict(double[][] testSet) {
            return Arrays.stream(testSet)            //Stream<double []>   
-    			        .mapToInt(z -> predict(z))  //IntStream  (livreaza int)
+    			        .mapToInt(this::predict)  //IntStream  (livreaza int)
     			        .toArray();
     }
     
@@ -121,4 +121,8 @@ public abstract class AbstractClassifier {
     public int[] getiClassCalculated() {
 		return iClassCalculated;
 	}
+
+    public double[][] getW() {
+    return w;
+    }
 }

@@ -3,9 +3,9 @@ package ro.usv.rf.classes;
 public class Neighbour implements Comparable<Neighbour>{
 	double distance;
 	int iClass;
-	
+
 	/**
-	 * 
+	 *
 	 * @param distance
 	 * @param iClass
 	 */
@@ -15,7 +15,7 @@ public class Neighbour implements Comparable<Neighbour>{
 		this.iClass = iClass;
 
 	}
-			
+
 	public double getDistance() {
 		return distance;
 	}
@@ -23,10 +23,10 @@ public class Neighbour implements Comparable<Neighbour>{
 	public int getIClass() {
 		return iClass;
 	}
-	
-	
+
+
 	@Override
 	public int compareTo(Neighbour o) {
-		return  Double.compare(distance, o.getDistance());
+		return (-1) * Double.compare(distance, o.getDistance());
 	}
 }

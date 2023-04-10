@@ -5,6 +5,7 @@ import ro.usv.rf.classes.Neighbour;
 import ro.usv.rf.classes.Pattern;
 import ro.usv.rf.utils.DistanceUtils;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,12 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.stream.IntStream;
 
 public class Classifier_KNN extends AbstractClassifier {
 
     IDistance d;
 
-    Pattern[] patternNeighbors ;
+    Pattern[] patternNeighbors;
     int k;
     private boolean debug = true;
 
@@ -39,42 +41,64 @@ public class Classifier_KNN extends AbstractClassifier {
         // all rest were done in super.train(X,F,iClass)
     }
 
+//    @Override
+//    public int predict(double[] z) {
+//        List<Neighbour> neighbours = new ArrayList<>();
+//
+//        for (int i = 0; i < n; i++) {
+//            if (Arrays.equals(X[i], z)) {
+//                continue; // skip if the pattern is the same as z
+//            }
+//            double distance = d.calculateDistance(X[i], z);
+//            neighbours.add(new Neighbour(distance, i));
+//        }
+//        Collections.sort(neighbours);
+//
+//        patternNeighbors = new Pattern[k];
+//        for (int i = 0; i < k; i++) {
+//            int index = neighbours.get(i).getIClass();
+//            patternNeighbors[i] = new Pattern(X[index], iClass[index]);
+//        }
+//
+//        Map<Integer, Integer> classCounts = new HashMap<>();
+//        for (int i = 0; i < k; i++) {
+//            int classIndex = iClass[neighbours.get(i).getIClass()];
+//            int count = classCounts.getOrDefault(classIndex, 0);
+//            classCounts.put(classIndex, count + 1);
+//        }
+//        int maxCount = 0;
+//        int predictedClass = 0;
+//        for (Map.Entry<Integer, Integer> entry : classCounts.entrySet()) {
+//            if (entry.getValue() > maxCount) {
+//                maxCount = entry.getValue();
+//                predictedClass = entry.getKey();
+//            }
+//        }
+//
+//        return predictedClass;
+
+    //    }
     @Override
     public int predict(double[] z) {
-        List<Neighbour> neighbours = new ArrayList<>();
-
+        PriorityQueue<Neighbour> pq = new PriorityQueue<>(k);
         for (int i = 0; i < n; i++) {
-            if (Arrays.equals(X[i], z)) {
-                continue; // skip if the pattern is the same as z
-            }
-            double distance = d.calculateDistance(X[i], z);
-            neighbours.add(new Neighbour(distance, i));
-        }
-        Collections.sort(neighbours);
-
-        patternNeighbors = new Pattern[k];
-        for (int i = 0; i < k; i++) {
-            int index = neighbours.get(i).getIClass();
-            patternNeighbors[i] = new Pattern(X[index], iClass[index]);
-        }
-
-        Map<Integer, Integer> classCounts = new HashMap<>();
-        for (int i = 0; i < k; i++) {
-            int classIndex = iClass[neighbours.get(i).getIClass()];
-            int count = classCounts.getOrDefault(classIndex, 0);
-            classCounts.put(classIndex, count + 1);
-        }
-        int maxCount = 0;
-        int predictedClass = -1;
-        for (Map.Entry<Integer, Integer> entry : classCounts.entrySet()) {
-            if (entry.getValue() > maxCount) {
-                maxCount = entry.getValue();
-                predictedClass = entry.getKey();
+            double dist = d.calculateDistance(z, X[i]);
+            Neighbour neighbour = new Neighbour(dist, iClass[i]);
+            if (pq.size() < k) {
+                pq.add(neighbour);
+            } else {
+                if (pq.peek().compareTo(neighbour) < 0) //compare distances
+                {
+                    pq.remove();
+                    pq.add(neighbour);
+                }
             }
         }
-
-        return predictedClass;
-
+        int[] nrv = new int[M + 1];
+        pq.forEach(v -> nrv[v.getIClass()]++);
+        return IntStream.range(1, M + 1)
+                .reduce(0, (iprec, icrt) ->
+                        nrv[icrt] > nrv[iprec] ? icrt : iprec);
     }
 
 
